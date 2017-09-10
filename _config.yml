@@ -1,0 +1,14 @@
+# Permalinks
+permalink:        pretty
+
+# Setup
+title:            new_one's home
+markdown:         kramdown
+tagline:          Stuffs and things
+url:              http://blerg.pelmers.com
+paginate:         10
+baseurl:          /
+author:
+  name:           Peter Elmers
+  url:            https://github.com/pelmers
+  email:          peter.elmers@yahoo.com
