@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<style>
+    section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .grid {
+        width: 95%;
+        display: flex;
+        flex-wrap: wrap;
+        list-style: none;
+    }
+    p {
+        font-family: sans-serif;
+        font-size: 0.9em;
+    }
+
+    .grid>li {
+        padding: 5px 10px 0px 5px;
+    }
+
+    #map {
+        height: 400px;
+    }
+
+    #token-required-span {
+        color: red;
+    }
+
+    #results-container {
+        padding-left: 5%;
+        width: 90%;
+    }
+
+    #results-container table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+        background-color: transparent;
+        border-collapse: collapse;
+        border-spacing: 0;
+        box-sizing: border-box;
+    }
+    tbody>tr:nth-of-type(even) {
+        background-color: #f5f5f5;
+    }
+    tbody td {
+        border-left: 1px solid gray;
+        border-right: 1px solid gray;
+        padding: 4px 8px;
+    }
+    tbody td:first-child {
+        border-left: none;
+    }
+    tbody td:last-child {
+        border-right: none;
+    }
+
+
+    thead {
+        background-color: #e5e5e5;
+    }
+    th {
+        padding: 4px 6px 7px 4px;
+        cursor: pointer;
+        width: 2.5em;
+        color: #333333;
+        font-family: sans-serif;
+        font-size: 0.9em;
+    }
+    th.selected {
+        background-color: #FC4C02;
+        color: white;
+    }
+    #usageA {
+        position: relative;
+        top: -10px;
+        left: 20px;
+    }
+    #usageDiv {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" href="spinner.css">
+<head>
+</head>
+
+<body>
+    <section>
+        <h3>Komwolf web interface</h3>
+        <a href="#" id="usageA">Usage</a>
+        <div id="usageDiv">
+            <p>
+            1. Fill out the fields below.
+            <br>
+            Note: Strava explore only returns 10 segments at a time. Bisection depth 1 means I split the area into 4 subplots. Depth 2 will split 16 subplots, etc.
+            <p>
+            2. Click find segments.
+            <br>
+            Note: If no results appear, my token may be rate-limited. Provide your own.
+            <p>
+            3. Fetch pace details.
+            <p>
+            4. Click columns to sort and hover to show in map.
+        </div>
+        <ul class="grid">
+            <li style="flex-basis: 25%;">
+                <p>
+                Activity type:
+                    <select id="select-activity-type">
+                        <option value="running">Running</option>
+                        <option value="riding">Riding</option>
+                    </select>
+                </p>
+                <p>Bisection depth:<input type="number" id="input-depth" value="0"></input>
+                </p>
+                <div>
+                    <p>
+                        <a href="https://www.strava.com/settings/api">Strava API token</a>:
+                        <input type="text" id="input-strava-token"></input>
+                    </p>
+                    <p style="margin-left:40%;">
+                        or
+                        <input type="checkbox" id="checkbox-strava-token">Borrow my token</input>
+                    </p>
+                    <span id="token-required-span" style="display:none;">Token required!</span>
+                </div>
+                <button id="btn-find-segments">Find Segments</button>
+                <div class="spinner" style="display:none;">
+                    <div class="rect1"></div>
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                </div>
+            </li>
+            <li style="flex-basis: 70%;">
+                <div id="map"></div>
+                <div id="results-header">
+                <button id="btn-fetch-details">Fetch Pace Details</button>
+            </div>
+            <div id="results-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="name" class="selected" style="width: 4.8em;">Name</th>
+                            <th data-sort="distance">Distance (km)</th>
+                            <th data-sort="elev">Elev Diff (m)</th>
+                            <th data-sort="time">Time</th>
+                            <th data-sort="speed">Speed (km/hr)</th>
+                            <th data-sort="pace">Pace (per km)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                    </tbody>
+                </table>
+            </div>
+        </li>
+    </ul>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+
+        </script>
+
+    <script src="index.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmajHHYshz141UWog1FY9HZ0TO-FBAKhU&callback=initMap"></script>
+</body>
+</html>
