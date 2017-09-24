@@ -4,6 +4,7 @@ const resultsMap = new Map();
 let sortField = "name";
 let sortDesc = false;
 let inflight = false;
+let map, box, displaySegment;
 const $spinner = $(".spinner");
 
 function startSpinner() {
@@ -26,27 +27,27 @@ function boundPosition(lat, lng, radius) {
 function initMap() {
     // Default starting location is uluru in Australia.
     const startLoc = {lat: -25.363, lng: 131.044};
-    window.map = new google.maps.Map(document.querySelector("#map"), {
+    map = new google.maps.Map(document.querySelector("#map"), {
         zoom: 4,
         center: startLoc
     });
-    window.box = new google.maps.Rectangle({
+    box = new google.maps.Rectangle({
         bounds: boundPosition(startLoc, 0.05),
         editable: true,
     });
-    window.displaySegment = new google.maps.Polyline({
+    displaySegment = new google.maps.Polyline({
         strokeColor: "red"
     });
-    window.box.setMap(window.map);
+    box.setMap(map);
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(pos => {
-            console.log(pos);
+            console.log("detected location:", pos);
             const bounds = boundPosition(pos.coords.latitude, pos.coords.longitude, 0.05);
-            window.map.fitBounds(bounds);
-            window.box.setBounds(bounds);
-            window.marker = new google.maps.Marker({
+            map.fitBounds(bounds);
+            box.setBounds(bounds);
+            new google.maps.Marker({
                 position: {lat: pos.coords.latitude, lng: pos.coords.longitude},
-                map: window.map,
+                map,
                 title: "Current Location"
             });
         });
@@ -130,7 +131,7 @@ function makeResultTr(result) {
     tds.push($("<td><a href=" + segmentUrl + ">" + result.name + "</a></td>"));
     tds.push($("<td>" + Number(result.distance / 1000).toFixed(2) + "</td>"));
     tds.push($("<td>" + result.elev_difference + "</td>"));
-    if (result.hasOwnProperty("leader")) {
+    if (result.leader) {
         const seconds = result.leader.moving_time;
         const hours = seconds / 3600;
         const kms = result.distance / 1000;
@@ -180,18 +181,18 @@ function displayResults() {
             const $resultNode = makeResultTr(val);
             // Add hover event to row that shows the route on map.
             $resultNode.hover(() => {
-                window.displaySegment.setMap(window.map);
+                displaySegment.setMap(map);
                 const path = google.maps.geometry.encoding.decodePath(val.points);
-                window.displaySegment.setPath(path);
+                displaySegment.setPath(path);
             }, () => {
-                window.displaySegment.setMap(null);
+                displaySegment.setMap(null);
             });
             $resultNode.appendTo($(resultsBody));
         }
     }
 }
-$("thead th").click(() => {
-    const $node = $(this);
+$("thead th").click((event) => {
+    const $node = $(event.target);
     // If we clicked twice on same field then reverse direction.
     const newSort = $node.data('sort');
     if (newSort == sortField) {
